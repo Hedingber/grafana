@@ -217,17 +217,17 @@ func (s *SocialGenericOAuth) UserInfo(client *http.Client, token *oauth2.Token) 
 	var rawUserInfoResponse HttpGetResponse
 	var err error
 
-	if !s.extractToken(&data, token) {
-		rawUserInfoResponse, err = HttpGet(client, s.apiUrl)
-		if err != nil {
-			return nil, fmt.Errorf("Error getting user info: %s", err)
-		}
-
-		err = json.Unmarshal(rawUserInfoResponse.Body, &data)
-		if err != nil {
-			return nil, fmt.Errorf("Error decoding user info JSON: %s", err)
-		}
+	rawUserInfoResponse, err = HttpGet(client, s.apiUrl)
+	if err != nil {
+		return nil, fmt.Errorf("Error getting user info: %s", err)
 	}
+
+	err = json.Unmarshal(rawUserInfoResponse.Body, &data)
+	if err != nil {
+		return nil, fmt.Errorf("Error decoding user info JSON: %s", err)
+	}
+
+	s.log.Debug("Received user info", "json", string(rawUserInfoResponse.Body), "data", data)
 
 	name := s.extractName(&data)
 
